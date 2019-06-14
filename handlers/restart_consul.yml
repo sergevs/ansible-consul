@@ -1,9 +1,11 @@
 ---
-- name: restart consul on Linux
+- name: restart consul on Nix
   service:
     name: consul
     state: restarted
-  when: ansible_os_family != "Windows"
+  when:
+    - ansible_service_mgr is defined
+    - ansible_service_mgr in ["openrc", "upstart", "smf", "systemd", "sysvinit"]
   listen: 'restart consul'
 
 - name: restart consul on windows
@@ -11,4 +13,13 @@
     name: consul
     state: restarted
   when: ansible_os_family == "Windows"
+  listen: 'restart consul'
+
+- name: restart consul on MacOS
+  shell: |
+     launchctl unload /Library/LaunchDaemons/hashicorp.consul.plist; \
+     launchctl load /Library/LaunchDaemons/hashicorp.consul.plist
+  when:
+    - ansible_service_mgr is defined
+    - ansible_service_mgr == "launchd"
   listen: 'restart consul'

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>hashicorp.consul</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>{{ consul_bin_path }}/consul</string>
+    <string>agent</string>
+    <string>-config-file={{ consul_config_path }}/config.json</string>
+    <string>-config-dir={{ consul_configd_path}}</string>
+    <string>-pid-file={{ consul_run_path }}/consul.pid</string>
+    </array>
+  <key>StandardOutPath</key>
+  <string>{{ consul_log_path }}/{{ consul_log_file }}</string>
+  <key>StandardErrorPath</key>
+  <string>{{ consul_log_path }}/{{ consul_log_file }}</string>
+  <key>KeepAlive</key>
+  <true/>
+  <key>RunAtLoad</key>
+  <true/>
+</dict>
+</plist>

@@ -155,7 +155,16 @@
     owner: root
     group: wheel
     mode: 0755
-  when: ansible_os_family == "FreeBSD"
+  when: ansible_service_mgr == "bsdinit"
+
+- name: Create MacOS launchd service
+  template:
+    src: consul_launchd.j2
+    dest: /Library/LaunchDaemons/hashicorp.consul.plist
+    owner: root
+    group: wheel
+    mode: 0744
+  when: ansible_service_mgr == "launchd"
 
 - name: Create SYSV init script
   template:
@@ -165,10 +174,8 @@
     group: root
     mode: 0755
   when:
-    - not ansible_service_mgr == "systemd"
+    - ansible_service_mgr in ["sysvinit", "upstart", "openrc"]
     - not ansible_os_family == "Debian"
-    - not ansible_os_family == "FreeBSD"
-    - not ansible_os_family == "Solaris"
 
 - name: Create Debian init script
   template:
@@ -180,8 +187,6 @@
   when:
     - not ansible_service_mgr == "systemd"
     - ansible_os_family == "Debian"
-    - not ansible_os_family == "FreeBSD"
-    - not ansible_os_family == "Solaris"
 
 - name: Create systemd script
   template:
@@ -194,8 +199,6 @@
   notify: restart consul
   when:
     - ansible_service_mgr == "systemd"
-    - not ansible_os_family == "FreeBSD"
-    - not ansible_os_family == "Solaris"
 
 - name: Reload systemd
   systemd:
@@ -209,28 +212,26 @@
     owner: root
     group: root
     mode: 0644
-  when: ansible_os_family == "Solaris"
+  when: ansible_service_mgr == "smf"
   register: smfmanifest
 
 - name: Import smf manifest
   shell: "svccfg import {{ consul_smf_manifest }}"
   when:
     - smfmanifest is changed
-    - ansible_os_family == "Solaris"
+    - ansible_service_mgr == "smf"
   tags: skip_ansible_lint
 - name: Import smf script
   shell: "svcadm refresh consul"
   when:
     - smfmanifest is changed
-    - ansible_os_family == "Solaris"
+    - ansible_service_mgr == "smf"
   tags: skip_ansible_lint
 
 - name: Enable Consul Snapshots on servers
   include_tasks: snapshot.yml
   when:
     - ansible_service_mgr == "systemd"
-    - not ansible_os_family == "FreeBSD"
-    - not ansible_os_family == "Solaris"
     - consul_snapshot | bool
 
 - block:
@@ -240,6 +241,12 @@
         name: consul
         state: started
         enabled: true
+      when: ansible_service_mgr != "launchd"
+
+    - name: Load Consul service
+      command: >-
+         launchctl load /Library/LaunchDaemons/hashicorp.consul.plist
+      when: ansible_service_mgr == "launchd"
 
     - name: Check Consul HTTP API (via TCP socket)
       wait_for:

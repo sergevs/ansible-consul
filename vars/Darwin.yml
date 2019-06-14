@@ -1,0 +1,17 @@
+---
+
+consul_os_packages: []
+
+# paths
+consul_darwin_path: "/usr/local"
+consul_config_path: "{{consul_darwin_path}}/etc/consul"
+consul_configd_path: "{{ consul_config_path }}/consul.d"
+consul_bootstrap_state: "{{consul_darwin_path}}/.consul_bootstrapped"
+consul_data_path: "{{consul_darwin_path}}/var/consul"
+consul_log_path: "{{consul_darwin_path}}/log"
+
+consul_syslog_enable: false
+consul_dnsmasq_enable: false
+consul_iptables_enable: false
+consul_syslog_enable: false
+

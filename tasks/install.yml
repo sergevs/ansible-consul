@@ -82,6 +82,7 @@
   register: install_temp
   tags: installation
   delegate_to: 127.0.0.1
+  check_mode: no
 
 - name: Unarchive Consul package
   unarchive:
@@ -101,6 +102,7 @@
     owner: "{{ consul_user }}"
     group: "{{ consul_group }}"
     mode: 0755
+  when: not ansible_check_mode
   tags: installation
 
 - name: Daemon reload systemd in case the binaries upgraded

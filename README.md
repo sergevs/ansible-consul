@@ -32,10 +32,11 @@ The role might work with other OS distributions and versions, but is known to fu
 * CentOS: 7
 * Debian: 9
 * FreeBSD: 11
+* MacOS: 10.13
 * RHEL: 7
 * OracleLinux: 7
 * Ubuntu: 16.04
-* Windows: Server 2012 R2
+* Windows: Server 2012 R2, Windows Server 2016
 
 Note that for the "local" installation mode (the default), this role will locally download only one instance of the Consul archive, unzip it and install the resulting binary on all desired Consul hosts.
 
