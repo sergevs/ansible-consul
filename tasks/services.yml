@@ -46,6 +46,14 @@
     managed_files: "{{ managed_files |default([]) }} + \
     [ '{{ consul_configd_path }}/service_{{ item.name }}.json' ]"
   with_items: "{{ consul_services }}"
+  when: ansible_os_family != 'Windows'
+
+- name: Set fact with list of service we manage
+  set_fact:
+    managed_files: "{{ managed_files |default([]) }} + \
+    [ '{{ consul_configd_path }}\\service_{{ item.name }}.json' ]"
+  with_items: "{{ consul_services }}"
+  when: ansible_os_family == 'Windows'
 
 - name: Delete non declared services
   file:
